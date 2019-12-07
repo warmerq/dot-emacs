@@ -1,0 +1,10 @@
+*~
+*/*~
+.cache/
+.lsp-session-v1
+auto-save-list/
+bookmarks
+elpa/
+myinit.el
+recentf
+transient
