@@ -3,10 +3,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(all-the-icons-ivy-buffer-commands '(ivy-switch-buffer-other-window ivy-switch-buffer))
- '(debug-on-error t)
- '(lsp-auto-guess-root nil)
- '(lsp-prefer-flymake nil)
  '(org-confirm-babel-evaluate nil)
  '(org-default-notes-file (concat org-directory "/inbox.org"))
  '(org-directory "~/org")
@@ -17,8 +13,7 @@
  '(org-startup-indented t)
  '(org-tags-column 80)
  '(package-selected-packages
-   '(lsp-origami better-shell smartparens iedit zerodark-theme zenburn-theme yasnippet-snippets which-key use-package try treemacs-projectile tern-auto-complete tao-theme rust-mode rg poet-theme origami org-bullets org noflet moe-theme magit lsp-ui js2-refactor hungry-delete htmlize grip-mode go-mode git-timemachine git-gutter flycheck faff-theme expand-region exec-path-from-shell dracula-theme doom-themes doom-modeline deadgrep dash-at-point counsel company-lsp company-emoji color-theme-sanityinc-tomorrow color-theme-modern cnfonts beacon base16-theme all-the-icons-ivy all-the-icons-dired alect-themes ac-js2))
- '(rust-format-on-save t))
+   '(yaml-mode zerodark-theme zenburn-theme yasnippet-snippets which-key use-package try treemacs-projectile tern-auto-complete tao-theme smartparens rust-mode rg protobuf-mode poet-theme ox-reveal org-bullets noflet moe-theme magit lsp-ui lsp-origami js2-refactor iedit hungry-delete htmlize grip-mode go-mode git-timemachine git-gutter flycheck faff-theme expand-region exec-path-from-shell dracula-theme doom-themes doom-modeline deadgrep dash-at-point counsel company-lsp company-emoji color-theme-sanityinc-tomorrow color-theme-modern cnfonts better-shell beacon base16-theme all-the-icons-ivy all-the-icons-dired alect-themes ac-js2)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

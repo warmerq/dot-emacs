@@ -140,7 +140,8 @@
   :ensure t
   :config
     (require 'ox-reveal)
-    (setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
+    ;;(setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
+    (setq org-reveal-root "https://cdn.bootcss.com/reveal.js/3.8.0/")
     (setq org-reveal-mathjax t)
 )
     (use-package htmlize
@@ -225,6 +226,17 @@
     (global-auto-revert-mode 1) ;; you might not want this
     (setq auto-revert-verbose nil) ;; or this
     (global-set-key (kbd "<f5>") 'revert-buffer)
+
+    (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+          backup-by-copying t    ; Don't delink hardlinks
+          version-control t      ; Use version numbers on backups
+          delete-old-versions t  ; Automatically delete excess backups
+          kept-new-versions 20   ; how many of the newest versions to keep
+          kept-old-versions 5    ; and how many of the old
+          )
+
+    (use-package yaml-mode
+      :ensure t)
   #+END_SRC
 
 * iedit and narrow / widen dwim
@@ -262,7 +274,7 @@
     ;; (define-key endless/toggle-map "n" #'narrow-or-widen-dwim)
     ;; This line actually replaces Emacs' entire narrowing keymap, that's
     ;; how much I like this command. Only copy it if that's what you want.
-    (define-key ctl-x-map "n" #'narrow-or-widen-dwim)
+    ;; (define-key ctl-x-map "n" #'narrow-or-widen-dwim) ;
 
   #+END_SRC
 
@@ -411,9 +423,9 @@
 * Better Shell
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package better-shell
-      :ensure t
-      :bind (("C-\"" . better-shell-shell)
-             ("C-:" . better-shell-remote-open)))
+    :ensure t
+    :bind (("C-\"" . better-shell-shell)
+           ("C-:" . better-shell-remote-open)))
 #+END_SRC
 
 #+RESULTS:
@@ -446,7 +458,7 @@
                  ("magit" (mode . magit-mode))
                  ("IRC" (or (mode . circe-channel-mode) (mode . circe-server-mode)))
                  ("web" (or (mode . web-mode) (mode . js2-mode)))
-                 ("shell" (or (mode . eshell-mode) (mode . shell-mode)))
+                 ("shell" (or (mode . eshell-mode) (mode . shell-mode) (mode . term-mode)))
                  ("mu4e" (or
 
                           (mode . mu4e-compose-mode)
@@ -696,6 +708,11 @@
 	(setq mode-line-format nil)))
 
   #+END_SRC
+* Protobuf Mode
+#+begin_src emacs-lisp
+  (use-package protobuf-mode
+    :ensure t)
+#+end_src
 * Org mode
   需要添加更多的功能 比如 org-agenda
   #+BEGIN_SRC emacs-lisp
@@ -703,6 +720,7 @@
       :ensure t
       :pin org)
 
+    (require 'org-tempo)
                                             ;(setenv "BROWSER" "firefox")
 
     (use-package org-bullets
@@ -728,6 +746,7 @@
                   org-file-apps))
 
     (global-set-key "\C-ca" 'org-agenda)
+    (define-key global-map (kbd "C-c l") 'org-store-link)
 
     (setq org-todo-keywords
           (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d/!)")
@@ -751,13 +770,14 @@
     (setq org-agenda-custom-commands
           '(("c" "Simple agenda view"
              ((agenda "")
-              (alltodo "")))))
+              (alltodo "" ((org-agenda-todo-ignore-scheduled 'all)))))))
 
     (global-set-key (kbd "C-c c") 'org-capture)
 
     (setq org-agenda-files 
           (list 
            (concat org-directory "/gtd.org")
+           (concat org-directory "/smartbow.org")
            (concat org-directory "/journal.org")
            (concat org-directory "/inbox.org")))
 
@@ -901,4 +921,6 @@
   (define-key z-map (kbd "f") 'origami-toggle-node)
   ;;(define-key z-map (kbd "w") 'z/swap-windows)
   ;;(define-key z-map (kbd "*") 'calc)
+  (define-key z-map (kbd "n") 'narrow-or-widen-dwim)
+  (define-key z-map (kbd "j") 'org-clock-goto)
 #+END_SRC
