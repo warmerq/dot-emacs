@@ -13,7 +13,7 @@
  '(org-startup-indented t)
  '(org-tags-column 80)
  '(package-selected-packages
-   '(yaml-mode zerodark-theme zenburn-theme yasnippet-snippets which-key use-package try treemacs-projectile tern-auto-complete tao-theme smartparens rust-mode rg protobuf-mode poet-theme ox-reveal org-bullets noflet moe-theme magit lsp-ui lsp-origami js2-refactor iedit hungry-delete htmlize grip-mode go-mode git-timemachine git-gutter flycheck faff-theme expand-region exec-path-from-shell dracula-theme doom-themes doom-modeline deadgrep dash-at-point counsel company-lsp company-emoji color-theme-sanityinc-tomorrow color-theme-modern cnfonts better-shell beacon base16-theme all-the-icons-ivy all-the-icons-dired alect-themes ac-js2)))
+   '(rc-mode zerodark-theme zenburn-theme yasnippet-snippets yaml-mode which-key use-package try treemacs-projectile tern-auto-complete tao-theme smartparens smart-tabs-mode rust-mode rg protobuf-mode poet-theme ox-reveal org-re-reveal org-bullets ob-mermaid noflet moe-theme mermaid-mode magit lsp-ui lsp-origami lsp-java kotlin-mode js2-refactor iedit hungry-delete grip-mode gradle-mode go-mode git-timemachine git-gutter flycheck-rust faff-theme expand-region exec-path-from-shell dracula-theme doom-themes doom-modeline dockerfile-mode deadgrep dash-at-point dap-mode counsel company-lsp company-emoji color-theme-sanityinc-tomorrow color-theme-modern cnfonts better-shell beacon base16-theme all-the-icons-ivy all-the-icons-dired alect-themes ac-js2)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

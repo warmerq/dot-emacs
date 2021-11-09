@@ -16,9 +16,15 @@
     )
 #+END_SRC
 
+* Basic Editing
+#+begin_src emacs-lisp
+(setq-default tab-width 4)
+
+#+end_src
 * repos
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 #+END_SRC
 
 * interface tweaks
@@ -28,6 +34,11 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
+* Encoding
+解决shell下中文显示乱码的问题
+#+begin_src emacs-lisp
+(setenv "LANG" "zh_CN.UTF-8")
+#+end_src
 * try
 #+BEGIN_SRC emacs-lisp
 (use-package try
@@ -134,18 +145,23 @@
 
   #+END_SRC
 
-* Reveal.js
+* Reveal
+
   #+BEGIN_SRC emacs-lisp  :tangle no
-  (use-package ox-reveal
-  :ensure t
-  :config
-    (require 'ox-reveal)
-    ;;(setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
-    (setq org-reveal-root "https://cdn.bootcss.com/reveal.js/3.8.0/")
-    (setq org-reveal-mathjax t)
-)
+    (use-package ox-reveal
+      :ensure t
+      :config
+      (require 'ox-reveal)
+      ;;(setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
+      (setq org-reveal-root "https://cdn.bootcss.com/reveal.js/3.8.0/")
+      (setq org-reveal-mathjax t))
     (use-package htmlize
-    :ensure t)
+      :ensure t)
+    (use-package org-re-reveal
+      :ensure t
+      :config
+      (require 'org-re-reveal)
+      (setq org-re-reveal-root "https://cdn.bootcss.com/reveal.js/3.8.0"))
   #+END_SRC
 
   #+RESULTS:
@@ -174,69 +190,73 @@
 
 * Misc packages
   #+BEGIN_SRC emacs-lisp
-    ;; Highlights the current cursor line
-    (global-hl-line-mode t)
+	;; Highlights the current cursor line
+	(global-hl-line-mode t)
 
 
-    (use-package projectile
-      :ensure t
-      :bind ("C-c p" . projectile-command-map)
-      :config
-      (projectile-global-mode)
-      (setq projectile-completion-system 'ivy))
+	(use-package projectile
+	  :ensure t
+	  :bind ("C-c p" . projectile-command-map)
+	  :config
+	  (projectile-global-mode)
+	  (setq projectile-completion-system 'ivy))
+
+	(use-package smart-tabs-mode
+	  :ensure t
+	  :config
+	  (smart-tabs-insinuate 'java ))
+
+	(use-package smartparens
+	  :ensure t
+	  :hook (prog-mode . smartparens-mode)
+	  :custom
+	  (sp-escape-quotes-after-insert nil)
+	  :config
+	  (require 'smartparens-config))
+
+	(show-paren-mode t)
+
+	;; flashes the cursor's line when you scroll
+	(use-package beacon
+	  :ensure t
+	  :config
+	  (beacon-mode 1)
+	  ;; (setq beacon-color "#666600")
+	  )
+
+	;; deletes all the whitespace when you hit backspace or delete
+	(use-package hungry-delete
+	  :ensure t
+	  :config
+	  (global-hungry-delete-mode))
 
 
-    (use-package smartparens
-      :ensure t
-      :hook (prog-mode . smartparens-mode)
-      :custom
-      (sp-escape-quotes-after-insert nil)
-      :config
-      (require 'smartparens-config))
+	(use-package multiple-cursors
+	  :ensure t)
 
-    (show-paren-mode t)
+	;; expand the marked region in semantic increments (negative prefix to reduce region)
+	(use-package expand-region
+	  :ensure t
+	  :config 
+	  (global-set-key (kbd "C-=") 'er/expand-region))
 
-    ;; flashes the cursor's line when you scroll
-    (use-package beacon
-      :ensure t
-      :config
-      (beacon-mode 1)
-      ;; (setq beacon-color "#666600")
-      )
-
-    ;; deletes all the whitespace when you hit backspace or delete
-    (use-package hungry-delete
-      :ensure t
-      :config
-      (global-hungry-delete-mode))
+	(setq save-interprogram-paste-before-kill t)
 
 
-    (use-package multiple-cursors
-      :ensure t)
+	(global-auto-revert-mode 1) ;; you might not want this
+	(setq auto-revert-verbose nil) ;; or this
+	(global-set-key (kbd "<f5>") 'revert-buffer)
 
-    ;; expand the marked region in semantic increments (negative prefix to reduce region)
-    (use-package expand-region
-      :ensure t
-      :config 
-      (global-set-key (kbd "C-=") 'er/expand-region))
+	(setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+		  backup-by-copying t    ; Don't delink hardlinks
+		  version-control t      ; Use version numbers on backups
+		  delete-old-versions t  ; Automatically delete excess backups
+		  kept-new-versions 20   ; how many of the newest versions to keep
+		  kept-old-versions 5    ; and how many of the old
+		  )
 
-    (setq save-interprogram-paste-before-kill t)
-
-
-    (global-auto-revert-mode 1) ;; you might not want this
-    (setq auto-revert-verbose nil) ;; or this
-    (global-set-key (kbd "<f5>") 'revert-buffer)
-
-    (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
-          backup-by-copying t    ; Don't delink hardlinks
-          version-control t      ; Use version numbers on backups
-          delete-old-versions t  ; Automatically delete excess backups
-          kept-new-versions 20   ; how many of the newest versions to keep
-          kept-old-versions 5    ; and how many of the old
-          )
-
-    (use-package yaml-mode
-      :ensure t)
+	(use-package yaml-mode
+	  :ensure t)
   #+END_SRC
 
 * iedit and narrow / widen dwim
@@ -366,6 +386,11 @@
 
 #+RESULTS:
 
+* Dockerfile
+#+begin_src emacs-lisp
+  (use-package dockerfile-mode :ensure t)
+
+#+end_src
 * git
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -676,6 +701,7 @@
       (python-mode . lsp-deferred) 
       (go-mode . lsp-deferred)
       (rust-mode . lsp-deferred)
+      (java-mode . lsp-deferred)
       )
 
     (use-package lsp-ui
@@ -687,9 +713,9 @@
       (lsp-ui-doc-background ((t (:background nil))))
       (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
       :bind (:map lsp-ui-mode-map
-		  ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-		  ([remap xref-find-references] . lsp-ui-peek-find-references)
-		  ("C-c u" . lsp-ui-imenu))
+                  ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+                  ([remap xref-find-references] . lsp-ui-peek-find-references)
+                  ("C-c u" . lsp-ui-imenu))
       :custom
       (lsp-ui-doc-enable t)
       (lsp-ui-doc-header t)
@@ -699,15 +725,36 @@
       (lsp-ui-sideline-enable nil)
       (lsp-ui-sideline-ignore-duplicate t)
       (lsp-ui-sideline-show-code-actions nil)
+      (lsp-ui-flycheck-enable t)
       :config
       ;; Use lsp-ui-doc-webkit only in GUI
       (setq lsp-ui-doc-use-webkit t)
       ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
       ;; https://github.com/emacs-lsp/lsp-ui/issues/243
       (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
-	(setq mode-line-format nil)))
+        (setq mode-line-format nil)))
 
   #+END_SRC
+* java mode
+#+begin_src emacs-lisp
+  (use-package lsp-java
+    :ensure t
+    :after lsp
+    :config 
+    (add-hook 'java-mode-hook 'lsp))
+
+  (use-package dap-mode
+    :ensure t
+    :after lsp-mode
+    :config
+    (dap-mode t)
+    (dap-ui-mode t))
+
+  (use-package dap-java :after (lsp-java))
+
+  (use-package kotlin-mode :ensure t)
+
+#+end_src
 * Protobuf Mode
 #+begin_src emacs-lisp
   (use-package protobuf-mode
@@ -770,7 +817,15 @@
     (setq org-agenda-custom-commands
           '(("c" "Simple agenda view"
              ((agenda "")
-              (alltodo "" ((org-agenda-todo-ignore-scheduled 'all)))))))
+              (alltodo "" ((org-agenda-todo-ignore-scheduled 'all)))))
+            ("o" "Office agenda view"
+             ((agenda "")
+              (alltodo "" ((org-agenda-todo-ignore-scheduled 'all))))
+             ((org-agenda-tag-filter-preset '("-gtd"))))
+            ("p" "Private agenda view"
+             ((agenda "")
+              (alltodo "" ((org-agenda-todo-ignore-scheduled 'all))))
+             ((org-agenda-tag-filter-preset '("-smartbow"))))))
 
     (global-set-key (kbd "C-c c") 'org-capture)
 
@@ -853,10 +908,11 @@
 * Markdown
   brew install grip
   #+BEGIN_SRC emacs-lisp
+    (add-to-list 'auto-mode-alist '("\\.md.html\\'" . markdown-mode))
     (use-package grip-mode
       :ensure t
       :bind (:map markdown-mode-command-map
-		  ("g" . grip-mode)))
+                  ("g" . grip-mode)))
   #+END_SRC
 
 * Apple Color Emoji

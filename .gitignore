@@ -1,6 +1,8 @@
 *~
 */*~
 .cache/
+eln-cache/
+workspace/
 .lsp-session-v1
 auto-save-list/
 bookmarks
@@ -9,3 +11,5 @@ myinit.el
 recentf
 transient
 eshell
+.dap-breakpoints
+projectile-bookmarks.eld
