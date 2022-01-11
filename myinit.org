@@ -1,10 +1,16 @@
 #+STARTUP: overview
-#+PROPERTY: header-args :comments yes :results silent
+#+PROPERTY: header-args :comments no :results silent :elisp :lexical t
+
+* lexical binding
+#+BEGIN_SRC emacs-lisp
+  ;;; -*- lexical-binding: t -*-
+#+END_SRC
 * Bootstrap
-  #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defconst *is-a-mac* (eq system-type 'darwin))
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  #+END_SRC
+  (setq use-package-always-ensure t)
+#+END_SRC
 
 * osx keys
 #+BEGIN_SRC emacs-lisp
@@ -18,289 +24,283 @@
 
 * Basic Editing
 #+begin_src emacs-lisp
-(setq-default tab-width 4)
-
+  (setq-default tab-width 4)
+  
 #+end_src
 * repos
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 #+END_SRC
 
 * interface tweaks
 #+BEGIN_SRC emacs-lisp
-(setq inhibit-startup-message t)
-(tool-bar-mode -1)
-(fset 'yes-or-no-p 'y-or-n-p)
+  (setq inhibit-startup-message t)
+  (tool-bar-mode -1)
+  (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
 * Encoding
 解决shell下中文显示乱码的问题
 #+begin_src emacs-lisp
-(setenv "LANG" "zh_CN.UTF-8")
+  (setenv "LANG" "zh_CN.UTF-8")
 #+end_src
 * try
 #+BEGIN_SRC emacs-lisp
-(use-package try
-  :ensure t)
+  (use-package try
+    :ensure t)
 #+END_SRC
 
 * which key
-  Brings up some help
-  #+BEGIN_SRC emacs-lisp
-    (use-package which-key
-      :ensure t
-      :config
-      (which-key-mode))
+Brings up some help
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :config
+    (which-key-mode))
 #+END_SRC
 
 * Ace windows for easy window switching
-  #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package ace-window
-  :ensure t
-  :init
-  (progn
-  (setq aw-scope 'global) ;; was frame
-  (global-set-key (kbd "C-x O") 'other-frame)
-    (global-set-key [remap other-window] 'ace-window)
-    (custom-set-faces
-     '(aw-leading-char-face
-       ((t (:inherit ace-jump-face-foreground :height 3.0))))) 
-    ))
-  #+END_SRC
+    :ensure t
+    :init
+    (progn
+      (setq aw-scope 'global) ;; was frame
+      (global-set-key (kbd "C-x O") 'other-frame)
+      (global-set-key [remap other-window] 'ace-window)
+      (custom-set-faces
+       '(aw-leading-char-face
+         ((t (:inherit ace-jump-face-foreground :height 3.0))))) 
+      ))
+#+END_SRC
 
-  #+RESULTS:
+#+RESULTS:
 
 * Swiper / Ivy / Counsel
-  Swiper gives us a really efficient incremental search with regular expressions
-  and Ivy / Counsel replace a lot of ido or helms completion functionality
-  #+BEGIN_SRC emacs-lisp
-    (use-package counsel
-      :ensure t
-      :bind
-      (("M-y" . counsel-yank-pop)
-       :map ivy-minibuffer-map
-       ("M-y" . ivy-next-line)))
-
-    (use-package ivy
-      :ensure t
-      :diminish (ivy-mode)
-      :bind (("C-x b" . ivy-switch-buffer))
-      :config
+Swiper gives us a really efficient incremental search with regular expressions
+and Ivy / Counsel replace a lot of ido or helms completion functionality
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel
+    :ensure t
+    :bind
+    (("M-y" . counsel-yank-pop)
+     :map ivy-minibuffer-map
+     ("M-y" . ivy-next-line)))
+  
+  (use-package ivy
+    :ensure t
+    :diminish (ivy-mode)
+    :bind (("C-x b" . ivy-switch-buffer))
+    :config
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (setq ivy-count-format "%d/%d ")
+    (setq ivy-display-style 'fancy))
+  
+  (use-package swiper
+    :ensure t
+    :bind (("C-s" . swiper-isearch)
+           ("C-r" . swiper-isearch)
+           ("C-c C-r" . ivy-resume)
+           ("M-x" . counsel-M-x)
+           ("C-x C-f" . counsel-find-file))
+    :config
+    (progn
       (ivy-mode 1)
       (setq ivy-use-virtual-buffers t)
-      (setq ivy-count-format "%d/%d ")
-      (setq ivy-display-style 'fancy))
-
-    (use-package swiper
-      :ensure t
-      :bind (("C-s" . swiper-isearch)
-	     ("C-r" . swiper-isearch)
-	     ("C-c C-r" . ivy-resume)
-	     ("M-x" . counsel-M-x)
-	     ("C-x C-f" . counsel-find-file))
-      :config
-      (progn
-	(ivy-mode 1)
-	(setq ivy-use-virtual-buffers t)
-	(setq ivy-display-style 'fancy)
-	(define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-	))
-  #+END_SRC
+      (setq ivy-display-style 'fancy)
+      (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+      ))
+#+END_SRC
 
 * Themes and modeline
-  #+BEGIN_SRC emacs-lisp
-    (use-package color-theme-modern
-      :ensure t)
-    (use-package zenburn-theme
-      :ensure t)
-    (use-package base16-theme
-      :ensure t)
-    (use-package moe-theme
-      :ensure t)
-    (use-package alect-themes
-      :ensure t)
-    (use-package zerodark-theme
-      :ensure t)
-    (use-package faff-theme
-      :ensure t)
-    (use-package poet-theme
-      :ensure t)
-    (use-package tao-theme
-      :ensure t)
-    (use-package doom-themes
-      :ensure t)
-    (use-package doom-modeline
-      :ensure t)
-    (require 'doom-modeline)
-    (doom-modeline-init)
-
-    ;; (use-package dracula-theme
-    ;;   :ensure t)
-    ;; (load-theme 'dracula t)
-
-    (use-package color-theme-sanityinc-tomorrow
-      :ensure t)
-    (load-theme 'sanityinc-tomorrow-night t)
-
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package color-theme-modern
+    :ensure t)
+  (use-package zenburn-theme
+    :ensure t)
+  (use-package base16-theme
+    :ensure t)
+  (use-package moe-theme
+    :ensure t)
+  (use-package alect-themes
+    :ensure t)
+  (use-package tao-theme
+    :ensure t)
+  (use-package doom-themes
+    :ensure t)
+  (use-package doom-modeline
+    :ensure t)
+  (require 'doom-modeline)
+  (doom-modeline-init)
+  
+  ;; (use-package dracula-theme
+  ;;   :ensure t)
+  ;; (load-theme 'dracula t)
+  
+  (use-package color-theme-sanityinc-tomorrow
+    :ensure t)
+  (load-theme 'sanityinc-tomorrow-night t)
+  
+#+END_SRC
 
 * Reveal
 
-  #+BEGIN_SRC emacs-lisp  :tangle no
-    (use-package ox-reveal
-      :ensure t
-      :config
-      (require 'ox-reveal)
-      ;;(setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
-      (setq org-reveal-root "https://cdn.bootcss.com/reveal.js/3.8.0/")
-      (setq org-reveal-mathjax t))
-    (use-package htmlize
-      :ensure t)
-    (use-package org-re-reveal
-      :ensure t
-      :config
-      (require 'org-re-reveal)
-      (setq org-re-reveal-root "https://cdn.bootcss.com/reveal.js/3.8.0"))
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp  :tangle no
+  (use-package ox-reveal
+    :ensure t
+    :config
+    (require 'ox-reveal)
+    ;;(setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
+    (setq org-reveal-root "https://cdn.bootcss.com/reveal.js/3.8.0/")
+    (setq org-reveal-mathjax t))
+  (use-package htmlize
+    :ensure t)
+  (use-package org-re-reveal
+    :ensure t
+    :config
+    (require 'org-re-reveal)
+    (setq org-re-reveal-root "https://cdn.bootcss.com/reveal.js/3.8.0"))
+#+END_SRC
 
-  #+RESULTS:
-  : t
+#+RESULTS:
+: t
 
 * Flycheck
-  #+BEGIN_SRC emacs-lisp
-    (use-package flycheck
-      :ensure t
-      :init
-      (global-flycheck-mode t))
-
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init
+    (global-flycheck-mode t))
+  
+#+END_SRC
 * Yasnippet
-  #+BEGIN_SRC emacs-lisp
-    (use-package yasnippet
-      :ensure t
-      :init
-	(yas-global-mode 1))
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :init
+    (yas-global-mode 1))
+  
+  (use-package yasnippet-snippets
+    :ensure t)
+#+END_SRC
 
-    (use-package yasnippet-snippets
-      :ensure t)
-  #+END_SRC
-
-  #+RESULTS:
+#+RESULTS:
 
 * Misc packages
-  #+BEGIN_SRC emacs-lisp
-	;; Highlights the current cursor line
-	(global-hl-line-mode t)
-
-
-	(use-package projectile
-	  :ensure t
-	  :bind ("C-c p" . projectile-command-map)
-	  :config
-	  (projectile-global-mode)
-	  (setq projectile-completion-system 'ivy))
-
-	(use-package smart-tabs-mode
-	  :ensure t
-	  :config
-	  (smart-tabs-insinuate 'java ))
-
-	(use-package smartparens
-	  :ensure t
-	  :hook (prog-mode . smartparens-mode)
-	  :custom
-	  (sp-escape-quotes-after-insert nil)
-	  :config
-	  (require 'smartparens-config))
-
-	(show-paren-mode t)
-
-	;; flashes the cursor's line when you scroll
-	(use-package beacon
-	  :ensure t
-	  :config
-	  (beacon-mode 1)
-	  ;; (setq beacon-color "#666600")
-	  )
-
-	;; deletes all the whitespace when you hit backspace or delete
-	(use-package hungry-delete
-	  :ensure t
-	  :config
-	  (global-hungry-delete-mode))
-
-
-	(use-package multiple-cursors
-	  :ensure t)
-
-	;; expand the marked region in semantic increments (negative prefix to reduce region)
-	(use-package expand-region
-	  :ensure t
-	  :config 
-	  (global-set-key (kbd "C-=") 'er/expand-region))
-
-	(setq save-interprogram-paste-before-kill t)
-
-
-	(global-auto-revert-mode 1) ;; you might not want this
-	(setq auto-revert-verbose nil) ;; or this
-	(global-set-key (kbd "<f5>") 'revert-buffer)
-
-	(setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
-		  backup-by-copying t    ; Don't delink hardlinks
-		  version-control t      ; Use version numbers on backups
-		  delete-old-versions t  ; Automatically delete excess backups
-		  kept-new-versions 20   ; how many of the newest versions to keep
-		  kept-old-versions 5    ; and how many of the old
-		  )
-
-	(use-package yaml-mode
-	  :ensure t)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  ;; Highlights the current cursor line
+  (global-hl-line-mode t)
+  
+  
+  (use-package projectile
+    :ensure t
+    :bind ("C-c p" . projectile-command-map)
+    :config
+    (projectile-global-mode)
+    (setq projectile-completion-system 'ivy))
+  
+  (use-package smart-tabs-mode
+    :ensure t
+    :config
+    (smart-tabs-insinuate 'java ))
+  
+  (use-package smartparens
+    :ensure t
+    :hook (prog-mode . smartparens-mode)
+    :custom
+    (sp-escape-quotes-after-insert nil)
+    :config
+    (require 'smartparens-config))
+  
+  (show-paren-mode t)
+  
+  ;; flashes the cursor's line when you scroll
+  (use-package beacon
+    :ensure t
+    :config
+    (beacon-mode 1)
+    ;; (setq beacon-color "#666600")
+    )
+  
+  ;; deletes all the whitespace when you hit backspace or delete
+  (use-package hungry-delete
+    :ensure t
+    :config
+    (global-hungry-delete-mode))
+  
+  
+  (use-package multiple-cursors
+    :ensure t)
+  
+  ;; expand the marked region in semantic increments (negative prefix to reduce region)
+  (use-package expand-region
+    :ensure t
+    :config 
+    (global-set-key (kbd "C-=") 'er/expand-region))
+  
+  (setq save-interprogram-paste-before-kill t)
+  
+  
+  (global-auto-revert-mode 1) ;; you might not want this
+  (setq auto-revert-verbose nil) ;; or this
+  (global-set-key (kbd "<f5>") 'revert-buffer)
+  
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+        backup-by-copying t    ; Don't delink hardlinks
+        version-control t      ; Use version numbers on backups
+        delete-old-versions t  ; Automatically delete excess backups
+        kept-new-versions 20   ; how many of the newest versions to keep
+        kept-old-versions 5    ; and how many of the old
+        )
+  
+  (use-package yaml-mode
+    :ensure t)
+#+END_SRC
 
 * iedit and narrow / widen dwim
 
-  #+BEGIN_SRC emacs-lisp
-    ;; mark and edit all copies of the marked region simultaniously. 
-    (use-package iedit
-      :ensure t)
+#+BEGIN_SRC emacs-lisp
+  ;; mark and edit all copies of the marked region simultaniously. 
+  (use-package iedit
+    :ensure t)
+  
+  ;; if you're windened, narrow to the region, if you're narrowed, widen
+  ;; bound to C-x n
+  (defun narrow-or-widen-dwim (p)
+    "If the buffer is narrowed, it widens. Otherwise, it narrows intelligently.
+  Intelligently means: region, org-src-block, org-subtree, or defun,
+  whichever applies first.
+  Narrowing to org-src-block actually calls `org-edit-src-code'.
+  
+  With prefix P, don't widen, just narrow even if buffer is already
+  narrowed."
+    (interactive "P")
+    (declare (interactive-only))
+    (cond ((and (buffer-narrowed-p) (not p)) (widen))
+          ((region-active-p)
+           (narrow-to-region (region-beginning) (region-end)))
+          ((derived-mode-p 'org-mode)
+           ;; `org-edit-src-code' is not a real narrowing command.
+           ;; Remove this first conditional if you don't want it.
+           (cond ((ignore-errors (org-edit-src-code))
+                  (delete-other-windows))
+                 ((org-at-block-p)
+                  (org-narrow-to-block))
+                 (t (org-narrow-to-subtree))))
+          (t (narrow-to-defun))))
+  
+  ;; (define-key endless/toggle-map "n" #'narrow-or-widen-dwim)
+  ;; This line actually replaces Emacs' entire narrowing keymap, that's
+  ;; how much I like this command. Only copy it if that's what you want.
+  ;; (define-key ctl-x-map "n" #'narrow-or-widen-dwim) ;
+  
+#+END_SRC
 
-    ;; if you're windened, narrow to the region, if you're narrowed, widen
-    ;; bound to C-x n
-    (defun narrow-or-widen-dwim (p)
-      "If the buffer is narrowed, it widens. Otherwise, it narrows intelligently.
-    Intelligently means: region, org-src-block, org-subtree, or defun,
-    whichever applies first.
-    Narrowing to org-src-block actually calls `org-edit-src-code'.
 
-    With prefix P, don't widen, just narrow even if buffer is already
-    narrowed."
-      (interactive "P")
-      (declare (interactive-only))
-      (cond ((and (buffer-narrowed-p) (not p)) (widen))
-            ((region-active-p)
-             (narrow-to-region (region-beginning) (region-end)))
-            ((derived-mode-p 'org-mode)
-             ;; `org-edit-src-code' is not a real narrowing command.
-             ;; Remove this first conditional if you don't want it.
-             (cond ((ignore-errors (org-edit-src-code))
-                    (delete-other-windows))
-                   ((org-at-block-p)
-                    (org-narrow-to-block))
-                   (t (org-narrow-to-subtree))))
-            (t (narrow-to-defun))))
-
-    ;; (define-key endless/toggle-map "n" #'narrow-or-widen-dwim)
-    ;; This line actually replaces Emacs' entire narrowing keymap, that's
-    ;; how much I like this command. Only copy it if that's what you want.
-    ;; (define-key ctl-x-map "n" #'narrow-or-widen-dwim) ;
-
-  #+END_SRC
-
-
-  #+RESULTS:
-  : narrow-or-widen-dwim
+#+RESULTS:
+: narrow-or-widen-dwim
 
 * Hydra
 #+BEGIN_SRC emacs-lisp
@@ -319,12 +319,12 @@
        ("t" toggle-truncate-lines "truncate")
        ("w" whitespace-mode "whitespace")
        ("q" nil "cancel")))
-
+  
     (global-set-key
      (kbd "C-x j")
      (defhydra gotoline 
        ( :pre (linum-mode 1)
-	      :post (linum-mode -1))
+         :post (linum-mode -1))
        "goto"
        ("t" (lambda () (interactive)(move-to-window-line-top-bottom 0)) "top")
        ("b" (lambda () (interactive)(move-to-window-line-top-bottom -1)) "bottom")
@@ -335,7 +335,7 @@
        ("p" (lambda () (interactive) (forward-line -1))  "up")
        ("g" goto-line "goto-line")
        ))
-
+  
     (global-set-key
      (kbd "C-c t")
      (defhydra hydra-global-org (:color blue)
@@ -349,9 +349,9 @@
        ("j" org-clock-goto "Clock Goto") ; global visit the clocked task
        ("c" org-capture "Capture") ; Don't forget to define the captures you want http://orgmode.org/manual/Capture.html
        ("l" (or )rg-capture-goto-last-stored "Last Capture"))
-
+  
      ))
-
+  
   (defhydra hydra-multiple-cursors (:hint nil)
     "
    Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
@@ -376,12 +376,12 @@
     ("<down-mouse-1>" ignore)
     ("<drag-mouse-1>" ignore)
     ("q" nil)
-
-
+  
+  
     ("<mouse-1>" mc/add-cursor-on-click)
     ("<down-mouse-1>" ignore)
     ("<drag-mouse-1>" ignore))
-
+  
 #+END_SRC
 
 #+RESULTS:
@@ -389,7 +389,7 @@
 * Dockerfile
 #+begin_src emacs-lisp
   (use-package dockerfile-mode :ensure t)
-
+  
 #+end_src
 * git
 #+BEGIN_SRC emacs-lisp
@@ -399,22 +399,22 @@
     (progn
       (bind-key "C-x g" 'magit-status)
       ))
-
+  
   (setq magit-status-margin
-	'(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
+        '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
   (use-package git-gutter
     :ensure t
     :init
     (global-git-gutter-mode +1))
-
+  
   (global-set-key (kbd "M-g M-g") 'hydra-git-gutter/body)
-
-
+  
+  
   (use-package git-timemachine
     :ensure t)
-
+  
   (defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
-					:hint nil)
+                                        :hint nil)
     "
     Git gutter:
       _j_: next hunk        _s_tage hunk     _q_uit
@@ -426,23 +426,23 @@
     ("j" git-gutter:next-hunk)
     ("k" git-gutter:previous-hunk)
     ("h" (progn (goto-char (point-min))
-		(git-gutter:next-hunk 1)))
+                (git-gutter:next-hunk 1)))
     ("l" (progn (goto-char (point-min))
-		(git-gutter:previous-hunk 1)))
+                (git-gutter:previous-hunk 1)))
     ("s" git-gutter:stage-hunk)
     ("r" git-gutter:revert-hunk)
     ("p" git-gutter:popup-hunk)
     ("R" git-gutter:set-start-revision)
     ("q" nil :color blue)
     ("Q" (progn (git-gutter-mode -1)
-		;; git-gutter-fringe doesn't seem to
-		;; clear the markup right away
-		(sit-for 0.1)
-		(git-gutter:clear))
+                ;; git-gutter-fringe doesn't seem to
+                ;; clear the markup right away
+                (sit-for 0.1)
+                (git-gutter:clear))
      :color blue))
-
-
-
+  
+  
+  
 #+END_SRC
 
 * Better Shell
@@ -465,12 +465,12 @@
           ("C-c f" . origami-recursively-toggle-node)
           ("C-c F" . origami-toggle-all-nodes))
     )
-
+  
   (use-package lsp-origami
     :ensure t
     :hook (origami-mode . #'lsp-origami-mode))
-
-
+  
+  
 #+END_SRC
 
 * IBUFFER
@@ -485,7 +485,7 @@
                  ("web" (or (mode . web-mode) (mode . js2-mode)))
                  ("shell" (or (mode . eshell-mode) (mode . shell-mode) (mode . term-mode)))
                  ("mu4e" (or
-
+  
                           (mode . mu4e-compose-mode)
                           (name . "\*mu4e\*")
                           ))
@@ -504,15 +504,15 @@
             (lambda ()
               (ibuffer-auto-mode 1)
               (ibuffer-switch-to-saved-filter-groups "default")))
-
+  
   ;; don't show these
                                           ;(add-to-list 'ibuffer-never-show-predicates "zowie")
   ;; Don't show filter groups if there are no buffers in that group
   (setq ibuffer-show-empty-filter-groups nil)
-
+  
   ;; Don't ask for confirmation to delete marked buffers
   (setq ibuffer-expert t)
-
+  
 #+END_SRC
 
 * Treemacs
@@ -522,7 +522,7 @@
     :defer t
     :config
     (progn
-
+  
       (setq treemacs-follow-after-init          t
             treemacs-width                      35
             treemacs-indentation                2
@@ -535,7 +535,7 @@
             treemacs-never-persist              nil
             treemacs-is-never-other-window      nil
             treemacs-goto-tag-strategy          'refetch-index)
-
+  
       (treemacs-follow-mode t)
       (treemacs-filewatch-mode t))
     :bind
@@ -545,32 +545,32 @@
           ("<C-M-tab>" . treemacs)
           ("M-0"       . treemacs-select-window)
           ("C-c 1"     . treemacs-delete-other-windows)
-        ))
+          ))
   (use-package treemacs-projectile
     :defer t
     :ensure t
     :config
     (setq treemacs-header-function #'treemacs-projectile-create-header)
-)
-
+    )
+  
 #+END_SRC
 
 #+RESULTS:
 
 * PATH 
 #+BEGIN_SRC emacs-lisp
-(use-package exec-path-from-shell
-:ensure t
-:config
-(exec-path-from-shell-initialize)
-)
+  (use-package exec-path-from-shell
+    :ensure t
+    :config
+    (exec-path-from-shell-initialize)
+    )
 #+END_SRC
 
 * Ripgrep
 #+BEGIN_SRC emacs-lisp
   (use-package deadgrep 
     :ensure t)
-
+  
   (use-package rg
     :ensure t
     :commands rg)
@@ -579,26 +579,26 @@
 * All the icons
 
 #+BEGIN_SRC emacs-lisp
-(use-package all-the-icons 
-:ensure t
-:defer 0.5)
-
-(use-package all-the-icons-ivy
-:ensure t
-  :after (all-the-icons ivy)
-  :custom (all-the-icons-ivy-buffer-commands '(ivy-switch-buffer-other-window ivy-switch-buffer))
-  :config
-  (add-to-list 'all-the-icons-ivy-file-commands 'counsel-dired-jump)
-  (add-to-list 'all-the-icons-ivy-file-commands 'counsel-find-library)
-  (all-the-icons-ivy-setup))
-
-
-(use-package all-the-icons-dired
-:ensure t
-)
-
-(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
-
+  (use-package all-the-icons 
+    :ensure t
+    :defer 0.5)
+  
+  (use-package all-the-icons-ivy
+    :ensure t
+    :after (all-the-icons ivy)
+    :custom (all-the-icons-ivy-buffer-commands '(ivy-switch-buffer-other-window ivy-switch-buffer))
+    :config
+    (add-to-list 'all-the-icons-ivy-file-commands 'counsel-dired-jump)
+    (add-to-list 'all-the-icons-ivy-file-commands 'counsel-find-library)
+    (all-the-icons-ivy-setup))
+  
+  
+  (use-package all-the-icons-dired
+    :ensure t
+    )
+  
+  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+  
 #+END_SRC
 
 * Javascript
@@ -611,7 +611,7 @@
       (add-hook 'js-mode-hook 'js2-minor-mode)
       (add-hook 'js2-mode-hook 'ac-js2-mode)
       ))
-
+  
   (use-package js2-refactor
     :ensure t
     :config 
@@ -619,7 +619,7 @@
       (js2r-add-keybindings-with-prefix "C-c C-m")
       ;; eg. extract function with `C-c C-m ef`.
       (add-hook 'js2-mode-hook #'js2-refactor-mode)))
-
+  
   ;; (use-package tern
   ;;   :ensure tern
   ;;   :ensure tern-auto-complete
@@ -630,34 +630,34 @@
   ;;     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
   ;;     ;;(tern-ac-setup)
   ;;     ))
-
+  
   ;;(use-package jade
   ;;:ensure t
   ;;)
-
+  
   ;; use web-mode for .jsx files
   (add-to-list 'auto-mode-alist '("\\.jsx$" . web-mode))
-
-
+  
+  
   ;; turn on flychecking globally
   (add-hook 'after-init-hook #'global-flycheck-mode)
-
+  
   ;; disable jshint since we prefer eslint checking
   (setq-default flycheck-disabled-checkers
-		(append flycheck-disabled-checkers
-			'(javascript-jshint)))
-
+                (append flycheck-disabled-checkers
+                        '(javascript-jshint)))
+  
   ;; use eslint with web-mode for jsx files
   (flycheck-add-mode 'javascript-eslint 'web-mode)
-
+  
   ;; customize flycheck temp file prefix
   (setq-default flycheck-temp-prefix ".flycheck")
-
+  
   ;; disable json-jsonlist checking for json files
   (setq-default flycheck-disabled-checkers
-		(append flycheck-disabled-checkers
-			'(json-jsonlist)))
-
+                (append flycheck-disabled-checkers
+                        '(json-jsonlist)))
+  
   ;; adjust indents for web-mode to 2 spaces
   (defun my-web-mode-hook ()
     "Hooks for Web mode. Adjust indents"
@@ -669,15 +669,15 @@
 #+END_SRC 
 
 * golang
-  need to install gopls: 
-  #+BEGIN_SRC shell
+need to install gopls: 
+#+BEGIN_SRC shell
   go get golang.org/x/tools/gopls@latest
-  #+END_SRC
+#+END_SRC
   
-  #+BEGIN_SRC emacs-lisp
-    (use-package go-mode
-      :ensure t)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode
+    :ensure t)
+#+END_SRC
 
 * rust  
 #+BEGIN_SRC emacs-lisp
@@ -688,72 +688,72 @@
   
 #+END_SRC
 * lsp mode
-  lsp mode setting, such as golang & python & rust maybe
-  #+BEGIN_SRC emacs-lisp
-    (use-package lsp-mode
-      :ensure t
-      :commands (lsp lsp-deferred)
-      :custom
-      (lsp-auto-guess-root nil)
-      (lsp-prefer-flymake nil) ; Use flycheck instead of flymake
-      :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
-      :hook 
-      (python-mode . lsp-deferred) 
-      (go-mode . lsp-deferred)
-      (rust-mode . lsp-deferred)
-      (java-mode . lsp-deferred)
-      )
-
-    (use-package lsp-ui
-      :ensure t
-      :after lsp-mode
-      :diminish
-      :commands lsp-ui-mode
-      :custom-face
-      (lsp-ui-doc-background ((t (:background nil))))
-      (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
-      :bind (:map lsp-ui-mode-map
-                  ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-                  ([remap xref-find-references] . lsp-ui-peek-find-references)
-                  ("C-c u" . lsp-ui-imenu))
-      :custom
-      (lsp-ui-doc-enable t)
-      (lsp-ui-doc-header t)
-      (lsp-ui-doc-include-signature t)
-      (lsp-ui-doc-position 'top)
-      (lsp-ui-doc-border (face-foreground 'default))
-      (lsp-ui-sideline-enable nil)
-      (lsp-ui-sideline-ignore-duplicate t)
-      (lsp-ui-sideline-show-code-actions nil)
-      (lsp-ui-flycheck-enable t)
-      :config
-      ;; Use lsp-ui-doc-webkit only in GUI
-      (setq lsp-ui-doc-use-webkit t)
-      ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
-      ;; https://github.com/emacs-lsp/lsp-ui/issues/243
-      (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
-        (setq mode-line-format nil)))
-
-  #+END_SRC
-* java mode
-#+begin_src emacs-lisp
-  (use-package lsp-java
+lsp mode setting, such as golang & python & rust maybe
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
     :ensure t
-    :after lsp
-    :config 
-    (add-hook 'java-mode-hook 'lsp))
-
-  (use-package dap-mode
+    :commands (lsp lsp-deferred)
+    :custom
+    (lsp-auto-guess-root nil)
+    (lsp-prefer-flymake nil) ; Use flycheck instead of flymake
+    :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
+    :hook 
+    (python-mode . lsp-deferred) 
+    (go-mode . lsp-deferred)
+    (rust-mode . lsp-deferred)
+    (java-mode . lsp-deferred)
+    )
+  
+  (use-package lsp-ui
     :ensure t
     :after lsp-mode
+    :diminish
+    :commands lsp-ui-mode
+    :custom-face
+    (lsp-ui-doc-background ((t (:background nil))))
+    (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
+    :bind (:map lsp-ui-mode-map
+                ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+                ([remap xref-find-references] . lsp-ui-peek-find-references)
+                ("C-c u" . lsp-ui-imenu))
+    :custom
+    (lsp-ui-doc-enable t)
+    (lsp-ui-doc-header t)
+    (lsp-ui-doc-include-signature t)
+    (lsp-ui-doc-position 'top)
+    (lsp-ui-doc-border (face-foreground 'default))
+    (lsp-ui-sideline-enable nil)
+    (lsp-ui-sideline-ignore-duplicate t)
+    (lsp-ui-sideline-show-code-actions nil)
+    (lsp-ui-flycheck-enable t)
     :config
-    (dap-mode t)
-    (dap-ui-mode t))
-
-  (use-package dap-java :after (lsp-java))
-
-  (use-package kotlin-mode :ensure t)
-
+    ;; Use lsp-ui-doc-webkit only in GUI
+    (setq lsp-ui-doc-use-webkit t)
+    ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
+    ;; https://github.com/emacs-lsp/lsp-ui/issues/243
+    (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
+      (setq mode-line-format nil)))
+  
+#+END_SRC
+* java mode
+#+begin_src emacs-lisp
+  ;; (use-package lsp-java					;
+  ;;   :ensure t
+  ;;   :after lsp
+  ;;   :config 
+  ;;   (add-hook 'java-mode-hook 'lsp))
+  
+  ;; (use-package dap-mode
+  ;;   :ensure t
+  ;;   :after lsp-mode
+  ;;   :config
+  ;;   (dap-mode t)
+  ;;   (dap-ui-mode t))
+  
+  ;; (use-package dap-java :after (lsp-java))
+  
+  ;; (use-package kotlin-mode :ensure t)
+  
 #+end_src
 * Protobuf Mode
 #+begin_src emacs-lisp
@@ -761,132 +761,393 @@
     :ensure t)
 #+end_src
 * Org mode
-  需要添加更多的功能 比如 org-agenda
-  #+BEGIN_SRC emacs-lisp
-    (use-package org 
-      :ensure t
-      :pin org)
-
-    (require 'org-tempo)
-                                            ;(setenv "BROWSER" "firefox")
-
-    (use-package org-bullets
-      :ensure t
-      :config
-      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-    (custom-set-variables
-     '(org-directory "~/org")
-     '(org-default-notes-file (concat org-directory "/inbox.org"))
-     '(org-export-html-postamble nil)
-     '(org-hide-leading-stars t)
-     '(org-startup-folded (quote overview))
-     '(org-startup-indented t)
-     '(org-confirm-babel-evaluate nil)
-     '(org-src-fontify-natively t)
-     '(org-tags-column 80)
-     )
-
-    (setq org-file-apps
-          (append '(("\\.docx\\'" . default)
-                    ("\\.pptx\\'" . default))
-                  org-file-apps))
-
-    (global-set-key "\C-ca" 'org-agenda)
-    (define-key global-map (kbd "C-c l") 'org-store-link)
-
-    (setq org-todo-keywords
-          (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d/!)")
-                  (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
-
-    (setq org-todo-keyword-faces
-          (quote (("TODO" :foreground "red" :weight bold)
-                  ("NEXT" :foreground "light blue" :weight bold)
-                  ("DONE" :foreground "green" :weight bold)
-                  ("WAITING" :foreground "orange" :weight bold)
-                  ("HOLD" :foreground "magenta" :weight bold)
-                  ("CANCELLED" :foreground "forest green" :weight bold)
-                  ("MEETING" :foreground "green" :weight bold)
-                  ("PHONE" :foreground "green" :weight bold))))
-
-    (setq org-refile-targets '((nil :maxlevel . 1)
-                               (org-agenda-files :maxlevel . 1)))
-    (setq org-outline-path-complete-in-steps nil)
-
-    (setq org-agenda-start-on-weekday nil)
-    (setq org-agenda-custom-commands
-          '(("c" "Simple agenda view"
-             ((agenda "")
-              (alltodo "" ((org-agenda-todo-ignore-scheduled 'all)))))
-            ("o" "Office agenda view"
-             ((agenda "")
-              (alltodo "" ((org-agenda-todo-ignore-scheduled 'all))))
-             ((org-agenda-tag-filter-preset '("-gtd"))))
-            ("p" "Private agenda view"
-             ((agenda "")
-              (alltodo "" ((org-agenda-todo-ignore-scheduled 'all))))
-             ((org-agenda-tag-filter-preset '("-smartbow"))))))
-
-    (global-set-key (kbd "C-c c") 'org-capture)
-
-    (setq org-agenda-files 
-          (list 
-           (concat org-directory "/gtd.org")
-           (concat org-directory "/smartbow.org")
-           (concat org-directory "/journal.org")
-           (concat org-directory "/inbox.org")))
-
-    (setq org-capture-templates
-          '(("l" "Link" entry (file+headline "~/org/inbox.org" "Links")
-             "* %? %^L %^g \n%T" :prepend t)
-            ("t" "To Do Item" entry (file+headline "~/org/inbox.org" "Tasks")
-             "* TODO %?\n%u" :prepend t)
-            ("n" "Note" entry (file+headline "~/org/inbox.org" "Notes")
-             "* %u %? " :prepend t)
-            ))
-
-
-    (defadvice org-capture-finalize 
-        (after delete-capture-frame activate)  
-      "Advise capture-finalize to close the frame"  
-      (if (equal "capture" (frame-parameter nil 'name))  
-          (delete-frame)))
-
-    (defadvice org-capture-destroy 
-        (after delete-capture-frame activate)  
-      "Advise capture-destroy to close the frame"  
-      (if (equal "capture" (frame-parameter nil 'name))  
-          (delete-frame)))  
-
-    (use-package noflet
-      :ensure t )
-    (defun make-capture-frame ()
-      "Create a new frame and run org-capture."
-      (interactive)
-      (make-frame '((name . "capture")))
-      (select-frame-by-name "capture")
-      (delete-other-windows)
-      (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
-        (org-capture)))
-
-    ;; ;; (require 'ox-beamer)
-    ;; ;; for inserting inactive dates
-    ;; (define-key org-mode-map (kbd "C-c >") (lambda () (interactive (org-time-stamp-inactive))))
-
-
-    (use-package htmlize :ensure t)
-
-  #+END_SRC
+需要添加更多的功能 比如 org-agenda
+#+BEGIN_SRC emacs-lisp :lexical t
+  (use-package org 
+    :ensure t
+    :pin org)
+  
+  (require 'org-tempo)
+                                          ;(setenv "BROWSER" "firefox")
+  
+  (use-package org-bullets
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  
+  (custom-set-variables
+   '(org-directory "~/org")
+   '(org-default-notes-file (concat org-directory "/Inbox.org"))
+   '(org-export-html-postamble nil)
+   '(org-hide-leading-stars t)
+   '(org-startup-folded (quote overview))
+   '(org-startup-indented t)
+   '(org-pretty-entities t)
+   '(org-hide-emphasis-markers t)
+   '(org-startup-with-inline-images t)
+   '(org-confirm-babel-evaluate nil)
+   '(org-src-fontify-natively t)
+   '(org-tags-column 80)
+   )
+  
+  (use-package org-appear
+    :ensure t
+    :hook (org-mode . org-appear-mode))
+  
+  (setq org-file-apps
+        (append '(("\\.docx\\'" . default)
+                  ("\\.pptx\\'" . default))
+                org-file-apps))
+  
+  (global-set-key "\C-ca" 'org-agenda)
+  (define-key global-map (kbd "C-c l") 'org-store-link)
+  
+  (setq org-todo-keywords
+        (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d/!)")
+                (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+  
+  (setq org-todo-keyword-faces
+        (quote (("TODO" :foreground "red" :weight bold)
+                ("NEXT" :foreground "light blue" :weight bold)
+                ("DONE" :foreground "green" :weight bold)
+                ("WAITING" :foreground "orange" :weight bold)
+                ("HOLD" :foreground "magenta" :weight bold)
+                ("CANCELLED" :foreground "forest green" :weight bold)
+                ("MEETING" :foreground "green" :weight bold)
+                ("PHONE" :foreground "green" :weight bold))))
+  
+  (setq org-refile-targets '((nil :maxlevel . 1)
+                             (org-agenda-files :maxlevel . 1)))
+  (setq org-outline-path-complete-in-steps nil)
+  
+  (setq org-agenda-start-on-weekday nil)
+  (setq org-agenda-custom-commands
+        '(("c" "Simple agenda view"
+           ((agenda "")
+            (alltodo "" ((org-agenda-todo-ignore-scheduled 'all)))))
+          ("o" "Office agenda view"
+           ((agenda "")
+            (alltodo "" ((org-agenda-todo-ignore-scheduled 'all))))
+           ((org-agenda-tag-filter-preset '("-gtd"))))
+          ("p" "Private agenda view"
+           ((agenda "")
+            (alltodo "" ((org-agenda-todo-ignore-scheduled 'all))))
+           ((org-agenda-tag-filter-preset '("-smartbow"))))))
+  
+  (global-set-key (kbd "C-c c") 'org-capture)
+  
+  ;; (setq org-agenda-files
+  ;;       (list org-directory))
+  
+  ;; (setq org-agenda-files 
+  ;;       (list 
+  ;;        (concat org-directory "/gtd.org")
+  ;;        (concat org-directory "/smartbow.org")
+  ;;        (concat org-directory "/journal.org")
+  ;;        (concat org-directory "/inbox.org")))
+  
+  (setq org-capture-templates
+        '(("l" "Link" entry (file+headline "~/org/inbox.org" "Links")
+           "* %? %^L %^g \n%T" :prepend t)
+          ("t" "To Do Item" entry (file+headline "~/org/inbox.org" "Tasks")
+           "* TODO %?\n%u" :prepend t)
+          ("n" "Note" entry (file+headline "~/org/inbox.org" "Notes")
+           "* %u %? " :prepend t)
+          ))
+  
+  
+  (defadvice org-capture-finalize 
+      (after delete-capture-frame activate)  
+    "Advise capture-finalize to close the frame"  
+    (if (equal "capture" (frame-parameter nil 'name))  
+        (delete-frame)))
+  
+  (defadvice org-capture-destroy 
+      (after delete-capture-frame activate)  
+    "Advise capture-destroy to close the frame"  
+    (if (equal "capture" (frame-parameter nil 'name))  
+        (delete-frame)))  
+  
+  ;; (use-package noflet
+  ;;   :ensure t )
+  ;; (defun make-capture-frame ()
+  ;;   "Create a new frame and run org-capture."
+  ;;   (interactive)
+  ;;   (make-frame '((name . "capture")))
+  ;;   (select-frame-by-name "capture")
+  ;;   (delete-other-windows)
+  ;;   (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+  ;;     (org-capture)))
+  
+  ;; ;; (require 'ox-beamer)
+  ;; ;; for inserting inactive dates
+  ;; (define-key org-mode-map (kbd "C-c >") (lambda () (interactive (org-time-stamp-inactive))))
+  
+  
+  (use-package htmlize :ensure t)
+  
+  ;; org-download
+  (use-package org-download
+    :ensure t
+    :config
+    (add-hook 'dired-mode-hook 'org-download-enable)
+    (setq-default org-download-image-dir "~/RoamNotes/images")
+    )
+  
+  ;;(setq org-image-actual-width (/ (display-pixel-width) 3))
+  (setq org-image-actual-width nil)
+  
+  ;; Org-Roam configuration
+  
+  (use-package org-roam
+    :ensure t
+    :demand t  ;; Ensure org-roam is loaded by default
+    :init
+    (setq org-roam-v2-ack t)
+    :custom
+    (org-roam-directory "~/RoamNotes")
+    (org-roam-completion-everywhere t)
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n I" . org-roam-node-insert-immediate)
+           ("C-c n g" . org-roam-tag-add)
+           ("C-c n p" . my/org-roam-find-project)
+           ("C-c n t" . my/org-roam-capture-task)
+           ("C-c n b" . my/org-roam-capture-inbox)
+           ("C-c n a" . org-roam-alias-add)
+           :map org-mode-map
+           ("C-M-i" . completion-at-point)
+           :map org-roam-dailies-map
+           ("Y" . org-roam-dailies-capture-yesterday)
+           ("T" . org-roam-dailies-capture-tomorrow))
+    :bind-keymap
+    ("C-c n d" . org-roam-dailies-map)
+    :config
+    (require 'org-roam-dailies) ;; Ensure the keymap is available
+    (require 'org-roam-protocol)
+    (org-roam-db-autosync-mode))
+  
+  ;; (setq org-roam-dailies-capture-templates
+  ;; 	  '(("d" "default" entry "* %?" :target
+  ;;   (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>"))))
+  
+  ;; (setq org-roam-dailies-capture-templates
+  ;;       `(("d" "default" plain ,(concat 
+  ;;                               "* tags\n"
+  ;;                               "- 一周前的：%?\n"
+  ;;                               "- 一个月前的：\n"
+  ;;                               "- 一年前的：\n"
+  ;;                               "* [[id:2854f68e-4791-43f9-8665-8ad60d51ba61][晨间日记]]\n\n"
+  ;;                               "** 小白\n\n"
+  ;;                               "** 小媙媙\n\n"
+  ;;                               "** 身体\n\n"
+  ;;                               "** 感受\n\n")
+  ;;          :target
+  ;;          (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n#+filetags: Daily"))))
+  
+  (setq org-roam-dailies-capture-templates
+        `(("d" "default" entry "* %?" 
+           :target
+           (file+head "%<%Y-%m-%d>.org"
+                      ,(concat "#+title: %<%Y-%m-%d>\n#+filetags: Daily\n" 
+                               "* Tags\n"
+                               "- 一周前的：\n"
+                               "- 一个月前的：\n"
+                               "- 一年前的：\n"
+                               "* [[id:2854f68e-4791-43f9-8665-8ad60d51ba61][晨间日记]]\n\n"
+                               "** 小白今天的情绪怎么样？\n\n"
+                               "** 对 小媙媙 有爱的三件事？\n\n"
+                               "** 八段锦练了咩？\n\n"
+                               "** 今天的重要待办事项 [/] \n\n"
+                               "** 有哪些开心的事情？\n\n"
+                               "** 有什么感悟？\n\n")))))
+  
+  (setq org-roam-capture-ref-templates
+        '(("w" "webpage" plain
+           "\n${body}\n%?"
+           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n\n")
+           :unnarrowed t)))
+  
+  
+  (defun org-roam-node-insert-immediate (arg &rest args)
+    (interactive "P")
+    (let ((args (push arg args))
+          (org-roam-capture-templates (list (append (car org-roam-capture-templates)
+                                                    '(:immediate-finish t)))))
+      (apply #'org-roam-node-insert args)))
+  
+  (defun my/org-roam-filter-by-tag (tag-name)
+    (lambda (node)
+      (member tag-name (org-roam-node-tags node))))
+  
+  (defun my/org-roam-list-notes-by-tag (tag-name)
+    (mapcar #'org-roam-node-file
+            (seq-filter
+             (my/org-roam-filter-by-tag tag-name)
+             (org-roam-node-list))))
+  
+  (defun my/org-roam-refresh-agenda-list ()
+    (interactive)
+    (setq org-agenda-files (my/org-roam-list-notes-by-tag "Project")))
+  
+  ;; Build the agenda list the first time for the session
+  (my/org-roam-refresh-agenda-list)
+  
+  (defun my/org-roam-project-finalize-hook ()
+    "Adds the captured project file to `org-agenda-files' if the
+    capture was not aborted."
+    ;; Remove the hook since it was added temporarily
+    (remove-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+  
+    ;; Add project file to the agenda list if the capture was confirmed
+    (unless org-note-abort
+      (with-current-buffer (org-capture-get :buffer)
+        (add-to-list 'org-agenda-files (buffer-file-name)))))
+  
+  (defun my/org-roam-find-project ()
+    (interactive)
+    ;; Add the project file to the agenda after capture is finished
+    (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+  
+    ;; Select a project file to open, creating it if necessary
+    (org-roam-node-find
+     nil
+     nil
+     (my/org-roam-filter-by-tag "Project")
+     :templates
+     '(("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: Project")
+        :unnarrowed t))))
+  
+  (defun my/org-roam-capture-inbox ()
+    (interactive)
+    (org-roam-capture- :node (org-roam-node-create)
+                       :templates '(("i" "inbox" plain "* %?"
+                                     :if-new (file+head "Inbox.org" "#+title: Inbox\n")))))
+  
+  (defun my/org-roam-capture-task ()
+    (interactive)
+    ;; Add the project file to the agenda after capture is finished
+    (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+  
+    ;; Capture the new task, creating the project file if necessary
+    (org-roam-capture- :node (org-roam-node-read
+                              nil
+                              (my/org-roam-filter-by-tag "Project"))
+                       :templates '(("p" "project" plain "** TODO %?"
+                                     :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                                                            "#+title: ${title}\n#+category: ${title}\n#+filetags: Project"
+                                                            ("Tasks"))))))
+  
+  (defun my/org-roam-copy-todo-to-today ()
+    (interactive)
+    (let ((org-refile-keep t) ;; Set this to nil to delete the original!
+          (org-roam-dailies-capture-templates
+           '(("t" "tasks" entry "%?"
+              :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
+          (org-after-refile-insert-hook #'save-buffer)
+          today-file
+          pos)
+      (save-window-excursion
+        (org-roam-dailies--capture (current-time) t)
+        (setq today-file (buffer-file-name))
+        (setq pos (point)))
+  
+      ;; Only refile if the target file is different than the current file
+      (unless (equal (file-truename today-file)
+                     (file-truename (buffer-file-name)))
+        (org-refile nil nil (list "Tasks" today-file nil pos)))))
+  
+  (add-to-list 'org-after-todo-state-change-hook
+               (lambda ()
+                 (when (equal org-state "DONE")
+                   (my/org-roam-copy-todo-to-today))))
+  
+  
+  
+  ;; (use-package org-roam
+  ;;   :after org
+  ;;   :custom
+  ;;   (org-roam-directory "~/RoamNotes")
+  ;;   (org-roam-complete-everywhere t)
+  ;;   :bind (("C-c n l" . org-roam-buffer-toggle)
+  ;;          ("C-c n f" . org-roam-node-find)
+  ;;          ("C-c n g" . org-roam-graph)
+  ;;          ("C-c n i" . org-roam-node-insert)
+  ;;          ("C-c n c" . org-roam-capture)
+  ;;          ("C-c n o" . org-id-get-create)
+  ;;          ("C-c n t" . org-roam-tag-add)
+  ;;          ("C-c n a" . org-roam-alias-add)
+  ;;          ;; Dailies
+  ;;          ("C-c n j" . org-roam-dailies-capture-today)
+  ;; 		 ;; personal def
+  ;; 		 ("C-c n p" . my/org-roam-find-project)
+  ;;          ("C-c n t" . my/org-roam-capture-task)
+  ;;          ("C-c n b" . my/org-roam-capture-inbox)
+  ;; 		 )
+  ;;   :config
+  ;;   (org-roam-db-autosync-mode t)
+  ;;   ;; If using org-roam-protocol
+  ;;   (require 'org-roam-protocol)
+  ;;   (require 'org-roam-dailies)
+  ;;   )
+  
+  ;; ;; (setq org-agenda-text-search-extra-files
+  ;; ;;       (list
+  ;; ;;        (concat org-directory "/notes")))
+  
+  ;; ;; (defun my/org-id-update-org-roam-files ()
+  ;; ;;   "Update Org-ID locations for all Org-roam files."
+  ;; ;;   (interactive)
+  ;; ;;   (org-id-update-id-locations (list "~/org/notes/*.org")))
+  
+  ;; (defun my/org-id-update-id-current-file ()
+  ;;   "Scan the current buffer for Org-ID locations and update them."
+  ;;   (interactive)
+  ;;   (org-id-update-id-locations (list (buffer-file-name (current-buffer)))))
+  
+  (setq org-roam-mode-section-functions
+        (list #'org-roam-backlinks-section
+              #'org-roam-reflinks-section
+              #'org-roam-unlinked-references-section
+              ))
+  
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-side-window)
+                 (side . right)
+                 (slot . 0)
+                 (window-width . 76)
+                 (window-parameters . ((no-other-window . t)
+                                       (no-delete-other-windows . t)))))
+  (use-package deft
+    :config
+    (setq deft-directory org-directory
+          deft-recursive t
+          deft-strip-summary-regexp ":PROPERTIES:\n\\(.+\n\\)+:END:\n"
+          deft-use-filename-as-title t)
+    :bind
+    ("C-c n s" . deft))					;search
+  
+  (use-package org-roam-ui
+    :after org-roam
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+#+END_SRC
 * org-mac-link
-  Customize the org group by typing M-x customize-group RET org RET,
-  then expand the Modules section, and enable mac-link.  You may also
-  optionally bind a key to activate the link grabber menu, like this:
+Customize the org group by typing M-x customize-group RET org RET,
+then expand the Modules section, and enable mac-link.  You may also
+optionally bind a key to activate the link grabber menu, like this:
 
-  #+BEGIN_SRC emacs-lisp
-    (require 'org-mac-link)
-    (add-hook 'org-mode-hook (lambda () 
-      (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)))  
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (require 'org-mac-link)
+  (add-hook 'org-mode-hook (lambda () 
+                             (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)))  
+#+END_SRC
 * Company
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -894,10 +1155,11 @@
     :config
     (setq company-idle-delay 0)
     (setq company-minimum-prefix-length 3)
-
+    (setq company-selection-wrap-around t)
+  
     (global-company-mode t)
     )
-
+  
   (use-package company-lsp
     :ensure t
     :config
@@ -906,73 +1168,75 @@
     )
 #+END_SRC
 * Markdown
-  brew install grip
-  #+BEGIN_SRC emacs-lisp
-    (add-to-list 'auto-mode-alist '("\\.md.html\\'" . markdown-mode))
-    (use-package grip-mode
-      :ensure t
-      :bind (:map markdown-mode-command-map
-                  ("g" . grip-mode)))
-  #+END_SRC
+brew install grip
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.md.html\\'" . markdown-mode))
+  (use-package grip-mode
+    :ensure t
+    :bind (:map markdown-mode-command-map
+                ("g" . grip-mode)))
+#+END_SRC
 
 * Apple Color Emoji
-  😄😆你好呀➡️ ➡️ ⬅️➡️
-  #+BEGIN_SRC emacs-lisp
-    (set-fontset-font
-     t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend)
-
-    (use-package company-emoji
-      :ensure t)
-
-    (use-package company
-      :ensure t
-      :config
-      ;; ...
-      (add-to-list 'company-backends 'company-emoji))
-
-  #+END_SRC
+😄😆你好呀➡️ ➡️ ⬅️➡️
+#+BEGIN_SRC emacs-lisp
+  (set-fontset-font
+   t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend)
+  
+  (use-package company-emoji
+    :ensure t)
+  
+  (use-package company
+    :ensure t
+    :config
+    ;; ...
+    (add-to-list 'company-backends 'company-emoji))
+  
+#+END_SRC
 * Dash
-  #+BEGIN_SRC emacs-lisp
-    (when (eq system-type 'darwin)
-      (use-package dash-at-point
-	:ensure t
-	:config (global-set-key (kbd "C-c D") 'dash-at-point)))
-  #+END_SRC
-* recent files
-  #+BEGIN_SRC emacs-lisp
-    (add-hook 'after-init-hook 'recentf-mode)
-    (setq-default
-     recentf-max-saved-items 1000
-     recentf-exclude '("/tmp/" "/ssh:"))
-  #+END_SRC
-* Chinese Font
-  #+BEGIN_SRC emacs-lisp
-    (use-package cnfonts
+#+BEGIN_SRC emacs-lisp
+  (when (eq system-type 'darwin)
+    (use-package dash-at-point
       :ensure t
-      :config (cnfonts-enable)
-      :bind (("C-M-=" . cnfonts-increase-fontsize)
-	     ("C-M--" . cnfonts-decrease-fontsize)))
-  #+END_SRC
+      :config (global-set-key (kbd "C-c D") 'dash-at-point)))
+#+END_SRC
+* recent files
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'after-init-hook 'recentf-mode)
+  (setq-default
+   recentf-max-saved-items 1000
+   recentf-exclude '("/tmp/" "/ssh:"))
+#+END_SRC
+* Chinese Font
+#+BEGIN_SRC emacs-lisp
+  (use-package cnfonts
+    :ensure t
+    :config (cnfonts-enable)
+    :bind (("C-M-=" . cnfonts-increase-fontsize)
+           ("C-M--" . cnfonts-decrease-fontsize)))
+#+END_SRC
 * emacs server
 #+BEGIN_SRC emacs-lisp
-(server-start)
+  (server-start)
 #+END_SRC
 * personal keymap
 #+BEGIN_SRC emacs-lisp
   ;; set up my own map
   (define-prefix-command 'z-map)
   (global-set-key (kbd "C-z") 'z-map) ;; was C-1
+  (define-key z-map (kbd "[") 'org-mark-ring-goto)
   (define-key z-map (kbd "k") 'compile)
   (define-key z-map (kbd "c") 'hydra-multiple-cursors/body)
   ;;(define-key z-map (kbd "m") 'mu4e)
   ;;(define-key z-map (kbd "1") 'org-global-cycle)
   ;;(define-key z-map (kbd "a") 'org-agenda-show-agenda-and-todo)
-  (define-key z-map (kbd "g") 'counsel-ag)
+  (define-key z-map (kbd "g") 'counsel-rg)
+  
   ;;(define-key z-map (kbd "2") 'make-frame-command)
   ;;(define-key z-map (kbd "0") 'delete-frame)
   (define-key z-map (kbd "o") 'ace-window)
-
-  (define-key z-map (kbd "s") 'flyspell-correct-word-before-point)
+  (define-key z-map (kbd "s") 'deadgrep)  
+                                          ;(define-key z-map (kbd "s") 'flyspell-correct-word-before-point)
   ;;(define-key z-map (kbd "i") 'z/load-iorg)
   (define-key z-map (kbd "f") 'origami-toggle-node)
   ;;(define-key z-map (kbd "w") 'z/swap-windows)
